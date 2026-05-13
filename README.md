@@ -1,11 +1,12 @@
 # people-counter-esp32
 
-# Overview
+## Overview
 
-People Counter System is an IoT-based project developed using ESP32, ultrasonic sensors, Firebase Realtime Database and a web dashboard.
+Smart People Counter System is an IoT-based project developed using ESP32, ultrasonic sensors, Firebase Realtime Database and a web dashboard.
 
 The system detects people entering and leaving a room, tracks occupancy in real time, displays information on an OLED screen and synchronizes data with Firebase for remote monitoring through a web application.
 
+---
 
 # Features
 
@@ -22,6 +23,7 @@ The system detects people entering and leaving a room, tracks occupancy in real 
 - Remote ESP32 restart
 - Dynamic max capacity update from web app
 
+---
 
 # Hardware Components
 
@@ -34,6 +36,7 @@ The system detects people entering and leaving a room, tracks occupancy in real 
 - Resistors
 - Jumper wires
 
+---
 
 # Technologies Used
 
@@ -51,6 +54,7 @@ The system detects people entering and leaving a room, tracks occupancy in real 
 - JavaScript
 - Chart.js
 
+---
 
 # System Architecture
 
@@ -65,6 +69,7 @@ The system:
 3. Sends data to Firebase
 4. Updates the web dashboard in real time
 
+---
 
 # Firebase Data Structure
 
@@ -80,6 +85,8 @@ peopleCounter
 |-- restartESP
 ```
 
+---
+
 # Web Dashboard
 
 The dashboard provides:
@@ -91,6 +98,8 @@ The dashboard provides:
 - Reset button
 - ESP32 restart button
 - Live Firebase synchronization
+
+---
 
 
 # How To Run
@@ -108,6 +117,8 @@ The dashboard provides:
 2. Run local server
 3. Open dashboard in browser
 
+
+---
 
 # Project Goals
 
