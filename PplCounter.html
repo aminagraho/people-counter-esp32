@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>People Counter Dashboard</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <style>
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      margin: 10px 0;
+      font-size: 32px;
+    }
+
+    .status {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .status.ok { background: #2ecc71; color: white; }
+    .status.full { background: #e74c3c; color: white; }
+
+    canvas {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 16px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>People Counter – Smart Room</h1>
+</header>
+
+<div class="container">
+
+  <div id="status" class="status ok">Available</div>
+
+  <div class="cards">
+    <div class="card">
+      <p>Current</p>
+      <h2 id="current">0</h2>
+    </div>
+    <div class="card">
+      <p>Max</p>
+      <h2 id="max">0</h2>
+    </div>
+    <div class="card">
+      <p>Average</p>
+      <h2 id="average">0</h2>
+    </div>
+    <div class="card">
+      <p>Peak</p>
+      <h2 id="peak">0</h2>
+    </div>
+  </div>
+
+  <div style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+  <input id="maxInput" type="number" min="1" placeholder="New max capacity"
+         style="padding:10px; border-radius:6px; border:1px solid #ccc;">
+  <button onclick="updateMax()">Update Max</button>
+</div>
+
+
+  <br>
+  <canvas id="chart" height="120"></canvas>
+
+  <button onclick="resetCounter()">Reset Counter</button>
+  <button onclick="restartESP()">Restart ESP32</button>
+</div>
+
+<script>
+  // 🔥 FIREBASE CONFIG (UBACI SVOJ)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAo2ekpEoULU-VMmgcLQvP7fiNv9AqjXoA",
+    authDomain: "peoplecounter-c9e56.firebaseapp.com",
+    databaseURL: "https://peoplecounter-c9e56-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "peoplecounter-c9e56"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const ctx = document.getElementById('chart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'People count',
+        data: [],
+        borderWidth: 2,
+        fill: false
+      }]
+    }
+  });
+
+  db.ref("peopleCounter").on("value", snapshot => {
+    const data = snapshot.val();
+
+    document.getElementById("current").innerText = data.current;
+    document.getElementById("max").innerText = data.max;
+    document.getElementById("average").innerText = data.average.toFixed(2);
+    document.getElementById("peak").innerText = data.peak;
+
+    const status = document.getElementById("status");
+    if (data.current >= data.max) {
+      status.className = "status full";
+      status.innerText = "CAPACITY FULL";
+    } else {
+      status.className = "status ok";
+      status.innerText = "Available";
+    }
+
+    if (data.history) {
+      chart.data.labels = Object.keys(data.history);
+      chart.data.datasets[0].data = Object.values(data.history);
+      chart.update();
+    
+  }});
+
+  function resetCounter() {
+    if (confirm("Reset counter?")) {
+      db.ref("peopleCounter/resetCounter").set(true);
+    }
+  }
+
+  function restartESP() {
+  if (confirm("Restart ESP32?")) {
+    db.ref("peopleCounter/restartESP").set(true);
+  }
+} 
+
+  function updateMax() {
+  const newMax = parseInt(document.getElementById("maxInput").value);
+
+  if (!newMax || newMax < 1) {
+    alert("Enter a valid max value");
+    return;
+  }
+
+  db.ref("peopleCounter/current").once("value").then(snapshot => {
+    const current = snapshot.val();
+
+    if (newMax < current) {
+      alert(
+        "Cannot set max capacity to " + newMax +
+        " because there are already " + current + " people inside."
+      );
+      return;
+    }
+
+    db.ref("peopleCounter/max").set(newMax);
+    alert("Max capacity updated to " + newMax);
+  });
+  
+
+}
+
+</script>
+
+</body>
+</html>
