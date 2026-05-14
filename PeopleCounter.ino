@@ -13,8 +13,8 @@ const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 0;
 
 //WIFI
-#define WIFI_SSID "Write wifi name"
-#define WIFI_PASSWORD "password"
+#define WIFI_SSID "WIFI_SSID"
+#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
 
 //FIREBASE
 #define API_KEY "YOUR_API_KEY"
