@@ -7,16 +7,16 @@
 #include <addons/RTDBHelper.h>
 #include <time.h>
 
-//NTP 
+
 const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 0;
 
-//WIFI
+
 #define WIFI_SSID "WIFI_SSID"
 #define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
 
-//FIREBASE
+
 #define API_KEY "YOUR_API_KEY"
 
 #define DATABASE_URL \
@@ -28,7 +28,7 @@ FirebaseConfig config;
 
 bool firebaseReady = false;
 
-//OLED
+
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
@@ -40,7 +40,7 @@ Adafruit_SSD1306 display(
   OLED_RESET
 );
 
-//SENSORS
+
 #define TRIG1 5
 #define ECHO1 18
 
@@ -49,11 +49,11 @@ Adafruit_SSD1306 display(
 
 #define DETECTION_DISTANCE 10
 
-//LED
+
 #define RED_LED 25
 #define GREEN_LED 26
 
-//COUNTER
+
 int currentCapacity = 0;
 int maxCapacity = 5;
 
@@ -74,10 +74,9 @@ unsigned long firstTriggerTime = 0;
 
 #define MIN_PASS_TIME 180
 
-//RESET
+
 bool lastResetState = false;
 
-// SETUP TIME
 
 void setupTime() {
   configTime(
@@ -87,7 +86,6 @@ void setupTime() {
   );
 }
 
-// DISTANCE
 
 long measureDistance(int trig, int echo) {
 
@@ -107,7 +105,7 @@ long measureDistance(int trig, int echo) {
   return duration * 0.034 / 2;
 }
 
-// OLED
+
 
 void updateOLED() {
 
@@ -130,7 +128,7 @@ void updateOLED() {
   display.display();
 }
 
-// LED
+
 
 void updateLED() {
 
@@ -146,26 +144,26 @@ void updateLED() {
   }
 }
 
-// FIREBASE SEND
+
 
 void sendToFirebase() {
 
   if (!firebaseReady || !Firebase.ready())
     return;
 
-  // Peak
+  
   if (currentCapacity > peakOccupancy) {
     peakOccupancy = currentCapacity;
   }
 
-  // Average
+ 
   sampleCount++;
   sumPeople += currentCapacity;
 
   float averageOccupancy =
     (float)sumPeople / sampleCount;
 
-  // Basic values
+  
   Firebase.RTDB.setInt(
     &fbdo,
     "/peopleCounter/current",
@@ -190,7 +188,7 @@ void sendToFirebase() {
     averageOccupancy
   );
 
-  // History
+  
   struct tm timeinfo;
 
   if (getLocalTime(&timeinfo)) {
@@ -224,7 +222,7 @@ void sendToFirebase() {
   }
 }
 
-// RESET FROM FIREBASE
+
 
 void checkResetFromFirebase() {
 
@@ -282,7 +280,7 @@ void checkResetFromFirebase() {
   }
 }
 
-// READ MAX
+
 
 void readMaxFromFirebase() {
 
@@ -306,7 +304,7 @@ void readMaxFromFirebase() {
   }
 }
 
-// RESTART ESP
+
 
 void checkRestartFromFirebase() {
 
@@ -327,27 +325,27 @@ void checkRestartFromFirebase() {
   }
 }
 
-// SETUP
+
 
 void setup() {
 
   Serial.begin(115200);
 
-  // Sensor pins
+  
   pinMode(TRIG1, OUTPUT);
   pinMode(ECHO1, INPUT);
 
   pinMode(TRIG2, OUTPUT);
   pinMode(ECHO2, INPUT);
 
-  // LED pins
+
   pinMode(RED_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
 
   digitalWrite(RED_LED, LOW);
   digitalWrite(GREEN_LED, HIGH);
 
-  // OLED
+  
   if (!display.begin(
         SSD1306_SWITCHCAPVCC,
         0x3C)) {
@@ -360,7 +358,7 @@ void setup() {
   updateOLED();
   updateLED();
 
-  // WiFi
+  
   WiFi.begin(
     WIFI_SSID,
     WIFI_PASSWORD
@@ -379,7 +377,7 @@ void setup() {
   
   setupTime();
 
-  // Firebase
+  
   config.api_key = API_KEY;
   config.database_url = DATABASE_URL;
 
@@ -407,7 +405,7 @@ void setup() {
   Firebase.reconnectWiFi(true);
 }
 
-// LOOP
+
 
 void loop() {
 
