@@ -20,7 +20,7 @@ const int daylightOffset_sec = 0;
 #define API_KEY "YOUR_API_KEY"
 
 #define DATABASE_URL \
-"https://peoplecounter-c9e56-default-rtdb.europe-west1.firebasedatabase.app/"
+"YOUR_DATABASE_URL"
 
 FirebaseData fbdo;
 FirebaseAuth auth;
